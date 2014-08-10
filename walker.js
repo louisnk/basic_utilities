@@ -1,8 +1,7 @@
 var fs = require('fs');
 var path = require('path');
-var log = console.log;
 
-exports.compileAll = function(dir, callback) {
+exports.findAll = function(dir, callback) {
 	
 	var templates = [];
 
