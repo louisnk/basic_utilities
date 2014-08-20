@@ -8,22 +8,23 @@ exports.findAll = function(dir, callback) {
 	function walk(directory, done) {
 
 		fs.readdir(directory, function(err, list) {
-			
-			list.forEach(function(file,i) {
-				var toRead = path.join(directory,file);
-				fs.stat(toRead, function(err, fileInfo) {
-					if (fileInfo.isDirectory()) {
-						walk(toRead, done);
-					} else if (fileInfo.isFile()) {
-						templates.push(toRead);
-						if (i == list.length - 1) {
-							return done(null,true);
-						}
-					} else return done(err, false);
+			if (list.length > 0) {
+				list.forEach(function(file,i) {
+					var toRead = path.join(directory,file);
+					fs.stat(toRead, function(err, fileInfo) {
+						if (fileInfo.isDirectory()) {
+							walk(toRead, done);
+						} else if (fileInfo.isFile()) {
+							templates.push(toRead);
+							if (i == list.length - 1) {
+								return done(null,true);
+							}
+						} else return done(err, false);
+					});
 				});
-				
-			});
-
+			} else {
+				return done(null, 'No files in directory');
+			}
 		});		
 	}
 
