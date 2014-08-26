@@ -4,7 +4,7 @@ exports.findAll = function(dir, options, callback) {
 		callback = options;
 		options = {};
 	}
-	
+
 	var files = options.toJSON ? {} : [];
 	var dircount = 0;
 
@@ -16,7 +16,7 @@ exports.findAll = function(dir, options, callback) {
 				var toRead = path.join(directory,file);
 				fs.stat(toRead, function(err, stats) {
 					if (stats.isDirectory()) {
-						
+												
 						if (options.toJSON) {
 							setFolder(toRead);
 							dircount++;
@@ -25,7 +25,6 @@ exports.findAll = function(dir, options, callback) {
 						walk(toRead, done);
 
 					} else if (stats.isFile()) {
-						
 						if (options.toJSON) {
 							var tree = toRead.split(/[\/\\]/),
 									parent = tree[tree.length - 2];
@@ -35,11 +34,15 @@ exports.findAll = function(dir, options, callback) {
 						} 
 						else files.push(toRead);
 						if (options.toJSON) {
+							console.log(dircount);
+							console.log(Object.keys(files).length);
 							if (i === list.length - 1 && dircount === Object.keys(files).length) {
+								console.log('should return');
 								return done(null,true);
 							}
 						}
 						if (!options.toJSON && i === list.length - 1) {
+							console.log('should return without json');
 							return done(null,true);
 						}
 					} else return done(err, false);
@@ -49,8 +52,17 @@ exports.findAll = function(dir, options, callback) {
 	}
 
 	function setFolder(folder) {
-		var dir = folder.slice(folder.lastIndexOf('\\') + 1);
+		var dir = folder.slice(folder.lastIndexOf('\\') + 1),
+				parent = folder.slice(0,folder.lastIndexOf('\\')).split('\\');
+				parent = parent[parent.length - 1];
+
+				
 		if (dir === 'images') return true;
+		
+		else if (parent !== 'images') {
+			files[parent][dir] = [];
+			if (files.parent.dir) return true;
+		}
 		else {
 			files[dir] = [];
 			if (files.dir) return true;
@@ -58,11 +70,15 @@ exports.findAll = function(dir, options, callback) {
 	}
 
 	
-	dir = path.normalize(dir)
+	dir = path.normalize(dir);
 	walk(dir, function(err, done) {
+		console.log('hello james')
 		if (err) {
+			console.error(err);
 			return callback(err, done);
-		} else 
+		} else {
+			console.log('hello from space')
+		}
 			return callback(null, files);
 	});
 }
