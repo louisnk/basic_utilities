@@ -72,10 +72,13 @@ exports.findAll = function(dir, options, callback) {
 	}
 
 	function setFolder(folder) {
-		// TODO: ADD WIN/NIX check to use appropriate slashes.
+		var slashes = '';
+		if (process.env.NODE_PATH.match('/usr')) {
+			slashes = '/'
+		} else slashes = '\\';
 
-		var dir = folder.slice(folder.lastIndexOf('\\') + 1),
-				parent = folder.slice(0,folder.lastIndexOf('\\')).split('\\');
+		var dir = folder.slice(folder.lastIndexOf(slashes) + 1),
+				parent = folder.slice(0,folder.lastIndexOf(slashes)).split(slashes);
 				parent = parent[parent.length - 1];
 
 		if (dir === 'images') return true;
