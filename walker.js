@@ -5,80 +5,101 @@ exports.findAll = function(dir, options, callback) {
 		options = {};
 	}
 
-	var files = options.toJSON ? {} : [];
+	var files = options.toJSON ? {} : [],
+			folders = [];
 	var dircount = 0;
 
 	function walk(directory, done) {
 
 		fs.readdir(directory, function(err, list) {
 			if (err) return done(err, 'Luke dirwalker thinks there is no such directory');
-			list.forEach(function(file,i) {
-				var toRead = path.join(directory,file);
-				fs.stat(toRead, function(err, stats) {
-					if (stats.isDirectory()) {
-												
-						if (options.toJSON) {
-							setFolder(toRead);
-							dircount++;
-						} 
+			if (list.length > 0) {
 
-						walk(toRead, done);
+				list.forEach(function(file,i) {
+					var toRead = path.join(directory,file);
 
-					} else if (stats.isFile()) {
-						if (options.toJSON) {
-							var tree = toRead.split(/[\/\\]/),
-									parent = tree[tree.length - 2];
-							if (files[parent] instanceof Array) {
-								files[parent].push(toRead);
+					fs.stat(toRead, function(err, stats) {
+						if (stats.isDirectory()) {
+							folders.push(file);
+
+							if (options.toJSON) {
+								setFolder(toRead);
+								dircount++;
+							} 
+
+							walk(toRead, done);
+
+						} else if (stats.isFile()) {
+							if (options.toJSON) {
+								var tree = toRead.split(/[\/\\]/),
+										parent = tree[tree.length - 2];
+
+								if (parent === 'thumbs') {
+									
+									var grandParent = tree[tree.length -3];
+									files[grandParent][parent].push(toRead);
+
+								} else if (files[parent] && 
+													 files[parent].images instanceof Array) {
+
+									files[parent].images.push(toRead);
+
+								} else {
+									// they're lowest level images (untouchables), 
+									// and we don't want them in the JSON
+								}
+
+							} 
+							else files.push(toRead);
+
+							if (options.toJSON) {
+								if (files.night && 
+										files.night.thumbs instanceof Array && 
+										i === list.length - 1) {
+									console.log('should return JSON');
+									return done(null,true);
+								}
 							}
-						} 
-						else files.push(toRead);
-						if (options.toJSON) {
-							console.log(dircount);
-							console.log(Object.keys(files).length);
-							if (i === list.length - 1 && dircount === Object.keys(files).length) {
-								console.log('should return');
+							else if (i === list.length - 1) {
+								console.log('should return without json');
 								return done(null,true);
 							}
-						}
-						if (!options.toJSON && i === list.length - 1) {
-							console.log('should return without json');
-							return done(null,true);
-						}
-					} else return done(err, false);
+						} else return done(err, false);
+					});
 				});
-			});
+			}
 		});		
 	}
 
 	function setFolder(folder) {
+		// TODO: ADD WIN/NIX check to use appropriate slashes.
+
 		var dir = folder.slice(folder.lastIndexOf('\\') + 1),
 				parent = folder.slice(0,folder.lastIndexOf('\\')).split('\\');
 				parent = parent[parent.length - 1];
 
-				
 		if (dir === 'images') return true;
 		
-		else if (parent !== 'images') {
+		else if (parent && parent !== 'images') {
+			files[parent] = files[parent] || {};
 			files[parent][dir] = [];
-			if (files.parent.dir) return true;
+
+			if (files[parent][dir]) return true;
+			else return false;
 		}
 		else {
-			files[dir] = [];
-			if (files.dir) return true;
+			files[dir] = files[dir] || { images: [] };
+			if (files[dir]) return true;
+			else return false;
 		}
 	}
 
 	
 	dir = path.normalize(dir);
 	walk(dir, function(err, done) {
-		console.log('hello james')
 		if (err) {
 			console.error(err);
 			return callback(err, done);
-		} else {
-			console.log('hello from space')
-		}
-			return callback(null, files);
+		} else return callback(null, files);
 	});
 }
