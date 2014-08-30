@@ -5,9 +5,60 @@ exports.findAll = function(dir, options, callback) {
 		options = {};
 	}
 
-	var files = options.toJSON ? {} : [],
-			folders = [];
-	var dircount = 0;
+	var dircount 	= 0,
+			folders 	= [],
+			files 		= options.toJSON ? {} : [];
+
+
+
+	function checkStats(stats, file, toRead, i, list, done) {
+		if (stats.isDirectory()) {
+			folders.push(file);
+
+			if (options.toJSON) {
+				setFolder(toRead);
+				dircount++;
+			} 
+
+			return walk(toRead, done);
+
+		} else if (stats.isFile()) {
+			if (options.toJSON) {
+				var tree = toRead.split(/[\/\\]/),
+						parent = tree[tree.length - 2];
+
+				if (parent === 'thumbs') {									
+					var grandParent = tree[tree.length -3];
+					files[grandParent][parent].push(toRead);
+
+				} else if (files[parent] && 
+									 files[parent].images instanceof Array) {
+
+					files[parent].images.push(toRead);
+
+				} else {
+					// they're lowest level images (untouchables), 
+					// and we don't want them in the JSON
+				}
+
+			} 
+			else files.push(toRead);
+
+			if (options.toJSON) {
+				if (files.night && 
+						files.night.thumbs instanceof Array && 
+						i === list.length - 1) {
+					return done(null,true);
+				}
+			}
+			else if (i === list.length - 1) {
+				console.log('should return without json');
+				return done(null,true);
+			}
+		} else return done(err, false);
+	}
+
+
 
 	function walk(directory, done) {
 
@@ -19,52 +70,7 @@ exports.findAll = function(dir, options, callback) {
 					var toRead = path.join(directory,file);
 
 					fs.stat(toRead, function(err, stats) {
-						if (stats.isDirectory()) {
-							folders.push(file);
-
-							if (options.toJSON) {
-								setFolder(toRead);
-								dircount++;
-							} 
-
-							walk(toRead, done);
-
-						} else if (stats.isFile()) {
-							if (options.toJSON) {
-								var tree = toRead.split(/[\/\\]/),
-										parent = tree[tree.length - 2];
-
-								if (parent === 'thumbs') {
-									
-									var grandParent = tree[tree.length -3];
-									files[grandParent][parent].push(toRead);
-
-								} else if (files[parent] && 
-													 files[parent].images instanceof Array) {
-
-									files[parent].images.push(toRead);
-
-								} else {
-									// they're lowest level images (untouchables), 
-									// and we don't want them in the JSON
-								}
-
-							} 
-							else files.push(toRead);
-
-							if (options.toJSON) {
-								if (files.night && 
-										files.night.thumbs instanceof Array && 
-										i === list.length - 1) {
-									console.log('should return JSON');
-									return done(null,true);
-								}
-							}
-							else if (i === list.length - 1) {
-								console.log('should return without json');
-								return done(null,true);
-							}
-						} else return done(err, false);
+						checkStats(stats, file, toRead, i, list, done);
 					});
 				});
 			}
@@ -72,24 +78,30 @@ exports.findAll = function(dir, options, callback) {
 	}
 
 	function setFolder(folder) {
-		// TODO: ADD WIN/NIX check to use appropriate slashes.
 
-		var dir = folder.slice(folder.lastIndexOf('\\') + 1),
-				parent = folder.slice(0,folder.lastIndexOf('\\')).split('\\');
-				parent = parent[parent.length - 1];
+		var slashes = '\\';
+		if (process.env.SystemDrive === 'C\:') {
+			slashes = '\\';
+		} else { slashes = '/' }
 
-		if (dir === 'images') return true;
+		var directory = folder.slice(folder.lastIndexOf(slashes) + 1),
+				origin 		= dir.slice(dir.lastIndexOf(slashes) + 1),
+				parent 		= folder.slice(0,folder.lastIndexOf(slashes)).split(slashes);
+				parent 		= parent[parent.length - 1];
+
+
+		if (directory === origin) return true;
 		
-		else if (parent && parent !== 'images') {
+		else if (parent && parent !== origin) {
 			files[parent] = files[parent] || {};
-			files[parent][dir] = [];
+			files[parent][directory] = [];
 
-			if (files[parent][dir]) return true;
+			if (files[parent][directory]) return true;
 			else return false;
 		}
 		else {
-			files[dir] = files[dir] || { images: [] };
-			if (files[dir]) return true;
+			files[directory] = files[directory] || { images: [] };
+			if (files[directory]) return true;
 			else return false;
 		}
 	}
