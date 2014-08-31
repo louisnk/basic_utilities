@@ -19,6 +19,8 @@ callback - simply returns (err,done) where done is a boolean (will be true when 
 
 #walker
 
-Just a recursive directory walker which returns a list of all the files it finds. Set the directory in the file itself. Returns an array.
+takes (directoryToRead, [options], callback) 
 
-Now takes optional second param - (directory, [options object], callback) - which currently only has use for its "toJSON" parameter, which is a bool and if set to true, will return a JSON object of your directory structure.
+Options is optional, and should be an object. Currently only supports one option - { toJSON: true } - which will return your directory structure and paths to files as JSON.
+
+Will soon add support for ignore lists.
