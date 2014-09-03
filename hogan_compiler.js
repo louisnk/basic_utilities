@@ -6,7 +6,8 @@ exports.makeTemplates = function(dir, list, callback) {
 	var templates = [];
 	
 	function getShortFileName(fileName) {
-		var lastSlashIndex = fileName.lastIndexOf('\\') + 1;
+		var slashes = (process.env.NODE_PATH.match('/usr')) ? '/' : '\\';
+		var lastSlashIndex = fileName.lastIndexOf(slashes) + 1;
 		return fileName.substr(lastSlashIndex, fileName.lastIndexOf(".") - lastSlashIndex);
 	}
 

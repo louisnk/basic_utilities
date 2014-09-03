@@ -56,12 +56,10 @@ exports.findAll = function(dir, options, callback) {
 								if (files.night && 
 										files.night.thumbs instanceof Array && 
 										i === list.length - 1) {
-									console.log('should return JSON');
 									return done(null,true);
 								}
 							}
 							else if (i === list.length - 1) {
-								console.log('should return without json');
 								return done(null,true);
 							}
 						} else return done(err, false);
