@@ -23,4 +23,6 @@ takes (directoryToRead, [options], callback)
 
 Options is optional, and should be an object. Currently only supports one option - { toJSON: true } - which will return your directory structure and paths to files as JSON.
 
-Will soon add support for ignore lists.
+Can also pass in a CSV, or array, of files or extensions to ignore, and it will be done.
+
+use {ignore: [arrayOfThingsToIgnore]} or {ignore: 'foo,bar,baz'}
