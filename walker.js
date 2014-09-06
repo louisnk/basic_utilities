@@ -79,15 +79,14 @@ exports.findAll = function(dir, options, callback) {
 
 	function setFolder(folder) {
 
-		var slash = '/';
-		
+		var slashes = '\\';
 		if (process.env.SystemDrive === 'C\:') {
-			slash = '\\';
-		}
+			slashes = '\\';
+		} else { slashes = '/' }
 
-		var directory = folder.slice(folder.lastIndexOf(slash) + 1),
-				origin 		= dir.slice(dir.lastIndexOf(slash) + 1),
-				parent 		= folder.slice(0,folder.lastIndexOf(slash)).split(slash);
+		var directory = folder.slice(folder.lastIndexOf(slashes) + 1),
+				origin 		= dir.slice(dir.lastIndexOf(slashes) + 1),
+				parent 		= folder.slice(0,folder.lastIndexOf(slashes)).split(slashes);
 				parent 		= parent[parent.length - 1];
 
 
