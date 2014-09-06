@@ -13,12 +13,8 @@ exports.findAll = function(dir, options, callback) {
 
 	function checkStats(stats, file, toRead, i, list, done) {
 		if (stats.isDirectory()) {
-			folders.push(file);
-
-			if (options.toJSON) {
-				setFolder(toRead);
-				dircount++;
-			} 
+			
+			handleDirectory(file, toRead);
 
 			return walk(toRead, done);
 
@@ -58,7 +54,14 @@ exports.findAll = function(dir, options, callback) {
 		} else return done(err, false);
 	}
 
+	function handleDirectory(file, toRead) {
+		folders.push(file);
 
+			if (options.toJSON) {
+				setFolder(toRead);
+				dircount++;
+			}
+	}
 
 	function walk(directory, done) {
 
@@ -79,14 +82,15 @@ exports.findAll = function(dir, options, callback) {
 
 	function setFolder(folder) {
 
-		var slashes = '\\';
+		var slash = '/';
+		
 		if (process.env.SystemDrive === 'C\:') {
-			slashes = '\\';
-		} else { slashes = '/' }
+			slash = '\\';
+		}
 
-		var directory = folder.slice(folder.lastIndexOf(slashes) + 1),
-				origin 		= dir.slice(dir.lastIndexOf(slashes) + 1),
-				parent 		= folder.slice(0,folder.lastIndexOf(slashes)).split(slashes);
+		var directory = folder.slice(folder.lastIndexOf(slash) + 1),
+				origin 		= dir.slice(dir.lastIndexOf(slash) + 1),
+				parent 		= folder.slice(0,folder.lastIndexOf(slash)).split(slash);
 				parent 		= parent[parent.length - 1];
 
 
