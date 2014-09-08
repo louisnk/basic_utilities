@@ -82,11 +82,8 @@ exports.findAll = function(dir, options, callback) {
 
 	function setFolder(folder) {
 
-		var slash = '/';
+		var slash = process.platform === 'win32' ? '\\' : '/';
 		
-		if (process.env.SystemDrive === 'C\:') {
-			slash = '\\';
-		}
 
 		var directory = folder.slice(folder.lastIndexOf(slash) + 1),
 				origin 		= dir.slice(dir.lastIndexOf(slash) + 1),
