@@ -3,19 +3,21 @@ var s = (process.platform === 'win32') ? '\\' : '/';
 
 var fs = require('fs');
 
-var findAll = function() {
+var findAll = function(callback) {
   var wait = 0,
       pairs = [],
       ltls = [],
 
-  read = function(path, level, callback) {
+  read = function(path, level) {
+    wait++;
 
-    function done() {
-      return (!wait && level < 10 && level > 1);
+    function finished() {
+      return (!wait && level <= 10 && level > 0);
     }
 
     fs.readdir(path, function(err,files) {
-
+      if (err) return callback(err);
+      
       files.forEach(function(file, i) {
         if (!file.match(/^\./)) {
           fs.stat(path + s + file, function(err, stats) {
@@ -23,18 +25,22 @@ var findAll = function() {
               var folder = getModuleName(path);
               pairs.push([path + s + file, pairLtl(folder)]);
             } else if (stats.isDirectory() && level < 10) {
-              wait++;
-              read(path + s + file, level++, callback);
+
+              // also tried wait++ here, but made no difference?
+
+              read(path + s + file, level++);
             }
           });
         }
       })
       
+      // Where should this decrement be happening?
+      // Seems like right here it's done looping through this directory?
+
       wait--;
       
-      if (done()) {
-        console.log(pairs.length)
-        // return callback(null, pairs);
+      if (finished()) {
+        return callback(null,pairs);
       }
 
     })
@@ -66,13 +72,17 @@ var findAll = function() {
       }
     }
     return '';
+  },
+
+  // return original callback?
+  returnFiles = function(err) {
+    if (!err) return callback(null,pairs);
+    return callback(err);
   }
   
   findLtls(process.cwd() + s + 'views', function(err, found) {
     if (!err && ltls.length > 0) {
-      read(process.cwd(), 0, function(err, files) {
-        console.log(files);
-      });    
+      read(process.cwd(), 0);
     }
   });
 
