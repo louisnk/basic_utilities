@@ -1,13 +1,14 @@
 var fs = require('fs'),
-		hogan = require('hogan.js'),
+		hogan = require('hjs'),
 		path = require('path');
 
 exports.makeTemplates = function(dir, list, callback) {
 	var templates = [];
 	
 	function getShortFileName(fileName) {
-		var slashes = (process.env.NODE_PATH.match('/usr')) ? '/' : '\\';
-		var lastSlashIndex = fileName.lastIndexOf(slashes) + 1;
+		var s = (process.platform === 'win32') ? '\\' : '/',
+				lastSlashIndex = fileName.lastIndexOf(s) + 1;
+
 		return fileName.substr(lastSlashIndex, fileName.lastIndexOf(".") - lastSlashIndex);
 	}
 
