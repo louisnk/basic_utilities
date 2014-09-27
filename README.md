@@ -32,7 +32,10 @@ use {ignore: [arrayOfThingsToIgnore]} or {ignore: 'foo,bar,baz'}
 Currently will generate random system data for a given period, either 1 hour or 1 week (options passed in)
 
 `var datagen = require('path/to/datagen');`
+
 `var data = datagen.all('week')`
 
-That's it. Returns arays for CPU, Disk, RAM, Eth0, Wifi, and can also generate separate data for each core of your CPU, as well as Disk i/o and usage.
+You can also access each dataset function individually - `var cpu = datagen.cpu()` will return a single random Math value.
+
+That's it. Returns arays for CPU, Disk, RAM, Eth0, Wifi, and Times. It can also generate separate data for each core of your CPU, as well as Disk i/o and usage.
 
