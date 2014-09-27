@@ -35,6 +35,10 @@ Currently will generate random system data for a given period, either 1 hour or 
 
 `var data = datagen.all('week')`
 
+`datagen.all('week')` will return an object with each property an array of data for the given part of the system.
+
+In this case, data would look like: `{ cpu: [1,2,3], disk: [3,4,5], ram: [6,7,8] }` etc.
+
 You can also access each dataset function individually - `var cpu = datagen.cpu()` will return a single random Math value.
 
 That's it. Returns arays for CPU, Disk, RAM, Eth0, Wifi, and Times. It can also generate separate data for each core of your CPU, as well as Disk i/o and usage.
