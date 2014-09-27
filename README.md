@@ -43,3 +43,5 @@ You can also access each dataset function individually - `var cpu = datagen.cpu(
 
 That's it. Returns arays for CPU, Disk, RAM, Eth0, Wifi, and Times. It can also generate separate data for each core of your CPU, as well as Disk i/o and usage.
 
+The `times` array is in milliseconds since 1970, format it with `new Date(times[i])` or moment.js or whatever.
+
