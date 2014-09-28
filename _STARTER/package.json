@@ -1,0 +1,28 @@
+{
+  "name": "Starter Package",
+  "version": "0.0.1",
+  "description": "A starter package.json",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/louisnk/REPONAME.git"
+  },
+  "keywords": [
+    "Louis",
+    "Kinley"
+  ],
+  "author": "Louis Kinley",
+  "bugs": {
+    "url": "https://github.com/louisnk/REPONAME/issues"
+  },
+  "homepage": "https://github.com/louisnk/REPONAME",
+  "dependencies": {
+    "express": "3.5.0",
+    "serve-favicon": "*",
+    "hjs": "*",
+    "less-middleware": "*"
+  }
+}
